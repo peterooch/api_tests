@@ -6,9 +6,8 @@
 LPCWSTR ClassName = L"ScriptStringTest";
 HINSTANCE hInst;
 
-static HRESULT DrawString(HDC hdc, LPCWSTR lpString, INT count, DWORD flags)
+static HRESULT DrawString(HDC hdc, INT y, LPCWSTR lpString, INT count, DWORD flags)
 {
-    static INT y = 0;
     SCRIPT_STRING_ANALYSIS ssa;
     HRESULT hr;
     LPWSTR flagstr;
@@ -36,7 +35,6 @@ static HRESULT DrawString(HDC hdc, LPCWSTR lpString, INT count, DWORD flags)
             break;
     }
     TextOutW(hdc, 130, y, flagstr, wcslen(flagstr));   
-    y += 20;
     ScriptStringFree(&ssa);
     return hr;
 }
@@ -51,7 +49,8 @@ static VOID PaintWnd(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         L"5. &&Test &&Text",
         L"6. Test &&&Text",
         L"7. Test &&&&Text",
-        L"8. Test Text&" };
+        L"8. Test Text&",
+        L"9. \u05D8\u05E7\u05E1\u05D8 &\u05D1\u05D3\u05D9\u05E7\u05D4" };
     static const DWORD flags[] = { 
         SSA_GLYPHS,
         SSA_GLYPHS | SSA_HOTKEY,
@@ -60,7 +59,7 @@ static VOID PaintWnd(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     PAINTSTRUCT ps;
     HFONT hfont;
     HDC hdc;
-    INT i, j;
+    INT i, j, y;
 
     hdc = BeginPaint(hwnd, &ps);
 
@@ -69,10 +68,10 @@ static VOID PaintWnd(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     if (hfont)
         SelectObject(hdc, hfont);
 
-    for (i = 0; i < SIZEOF(tests); i++)
+    for (i = 0, y = 0; i < SIZEOF(tests); i++)
     {
-        for (j = 0; j < SIZEOF(flags); j++)
-            DrawString(hdc, tests[i], wcslen(tests[i]), flags[j]);
+        for (j = 0; j < SIZEOF(flags); j++, y += 20)
+            DrawString(hdc, y, tests[i], wcslen(tests[i]), flags[j]);
     }
 
     EndPaint(hwnd, &ps);
