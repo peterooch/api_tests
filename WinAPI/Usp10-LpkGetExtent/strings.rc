@@ -1,0 +1,9 @@
+#include <windef.h>
+#pragma code_page(65001)
+
+STRINGTABLE
+BEGIN
+    1 "בלה בלה"
+    2 "אבגדהוזחט יכלמג"
+    3 "العربية"
+END
